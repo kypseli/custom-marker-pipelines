@@ -4,21 +4,61 @@ pipeline {
     timestamps()
   }
   agent { 
-    docker { 
-      image "maven:3.5.0-jdk-8-alpine"
-      reuseNode true 
-    } 
+    label 'docker'
   }
   stages {
     stage('Build and Verify') {
       steps {
         gitShortCommit(7)
         echo "${SHORT_COMMIT}"
-        sh 'mvn verify'
+        container('maven') {
+          sh 'mvn verify'
+        }
       }
     }
-    stage('Deploy') {
+    stage('Quality Analysis') {
+      environment {
+          SONAR = credentials('sonar.beedemo')
+      }
       steps {
+          withSonarQubeEnv('beedemo') {
+              container('maven') {
+                  sh 'mvn -Dsonar.scm.disabled=True -Dsonar.login=$SONAR -Dsonar.branch=$BRANCH_NAME sonar:sonar'
+              }
+          }
+      }
+    }
+    stage('Quality Gate') {
+        options {
+            timeout(time: 10, unit: 'MINUTES') 
+        }
+        agent none
+        steps {
+            script {
+                def qg = waitForQualityGate()
+                if (qg.status != 'OK') {
+                    error "Pipeline failure due to quality gate failure: ${qg.status}"
+                }
+            }
+        }
+    }
+    stage('Deploy') {
+      options {
+          timeout(time: 5, unit: 'MINUTES') 
+      }
+      environment {
+          DOCKER_TAG = "${BUILD_NUMBER}-${SHORT_COMMIT}"
+      }
+      when {
+          branch 'master'
+      }
+      input {
+          message "Deploy to prod?"
+          ok "Yes"
+          submitter "kypseli*ops"
+      }
+      steps {
+        //todo real deploy
         echo 'deploying'
         sleep(100)
       }
