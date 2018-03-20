@@ -23,7 +23,7 @@ pipeline {
       steps {
           withSonarQubeEnv('beedemo') {
               container('maven') {
-                  sh 'mvn -Dsonar.scm.disabled=True -Dsonar.login=$SONAR -Dsonar.branch=$BRANCH_NAME sonar:sonar'
+                  sh 'mvn -Dsonar.scm.disabled=True -Dsonar.host.url=https://sonar.k8s.beedemo.net -Dsonar.login=$SONAR -Dsonar.branch=$BRANCH_NAME sonar:sonar'
               }
           }
       }
