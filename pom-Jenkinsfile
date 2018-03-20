@@ -64,7 +64,7 @@ pipeline {
         script {
           def repoName = sh(returnStdout: true, script:'basename `git rev-parse --show-toplevel`')
          }
-        publishEvent generic(repoName)
+        publishEvent generic("$repoName")
       }
     }
   }
