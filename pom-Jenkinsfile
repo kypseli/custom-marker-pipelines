@@ -61,6 +61,10 @@ pipeline {
         //todo real deploy
         echo 'deploying'
         sleep(100)
+        script {
+          def repoName = sh(returnStdout: true, script:'basename `git rev-parse --show-toplevel`')
+         }
+        publishEvent generic(repoName)
       }
     }
   }
