@@ -61,7 +61,7 @@ pipeline {
       steps {
         //todo real deploy
         echo "deploying ${REPO_NAME}"
-        sleep(10)
+        sleep(7)
         publishEvent generic("${REPO_NAME}")
       }
     }
