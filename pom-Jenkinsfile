@@ -48,6 +48,7 @@ pipeline {
       }
       environment {
           DOCKER_TAG = "${BUILD_NUMBER}-${SHORT_COMMIT}"
+          REPO_NAME = sh(returnStdout: true, script:'basename `git rev-parse --show-toplevel`')
       }
       when {
           branch 'master'
@@ -61,10 +62,7 @@ pipeline {
         //todo real deploy
         echo 'deploying'
         sleep(10)
-        script {
-          def repoName = sh(returnStdout: true, script:'basename `git rev-parse --show-toplevel`')
-         }
-        publishEvent generic("$repoName")
+        publishEvent generic("${REPO_NAME}")
       }
     }
   }
