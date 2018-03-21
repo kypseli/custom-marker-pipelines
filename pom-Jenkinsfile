@@ -34,13 +34,12 @@ pipeline {
         }
         agent none
         steps {
-            //TODO fix issue with Sonarqube Quality Gate
-            /*script {
+            script {
                 def qg = waitForQualityGate()
                 if (qg.status != 'OK') {
                     error "Pipeline failure due to quality gate failure: ${qg.status}"
                 }
-            }*/
+            }
         }
     }
     stage('Deploy') {
