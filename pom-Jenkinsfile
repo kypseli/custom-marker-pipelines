@@ -48,7 +48,7 @@ pipeline {
       }
       environment {
           DOCKER_TAG = "${BUILD_NUMBER}-${SHORT_COMMIT}"
-          REPO_NAME = sh(returnStdout: true, script:'basename -s .git `git config --get remote.origin.url`')
+          REPO_NAME = sh(returnStdout: true, script:'basename `git config --get remote.origin.url` .git')
       }
       when {
           branch 'master'
