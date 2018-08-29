@@ -1,5 +1,10 @@
 #!groovy
 library 'kypseli'
+script {   
+    def repoName
+    def tag
+    def pushBranch
+}
 pipeline {
     options { 
         buildDiscarder(logRotator(numToKeepStr: '7')) 
@@ -14,10 +19,6 @@ pipeline {
             steps {
                 checkout scm
                 script {
-                    def repoName
-                    def tag
-                    def pushBranch
-
                     tokens = "${env.JOB_NAME}".tokenize('/')
                     repo = tokens[tokens.size()-2]
                     tag = tokens[tokens.size()-1]
