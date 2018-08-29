@@ -6,7 +6,7 @@ pipeline {
     }
     agent none
     stages {
-        stage('Build and Push') {
+        stage('Build and Push Image') {
             steps {
                 dockerFileDefaults
             }
