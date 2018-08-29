@@ -1,10 +1,5 @@
 #!groovy
 library 'kypseli'
-script {   
-    def repoName
-    def tag
-    def pushBranch
-}
 pipeline {
     options { 
         buildDiscarder(logRotator(numToKeepStr: '7')) 
@@ -13,37 +8,9 @@ pipeline {
     agent none
     stages {
         stage('Get Properties') {
-            agent {
-                label 'default-jnlp'
-            }
             steps {
-                checkout scm
-                script {
-                    tokens = "${env.JOB_NAME}".tokenize('/')
-                    repo = tokens[tokens.size()-2]
-                    tag = tokens[tokens.size()-1]
-                    def d = [repo: repo, tag: tag, pushBranch: false]
-                    def props = readProperties defaults: d, file: 'dockerBuildPublish.properties'
-                    repoName = props['repo']
-                    tag = props['tag']
-                    pushBranch = props['pushBranch']
-                    echo "push non master branch: $pushBranch"
-                    stash name: 'everything', includes: "**"
-                }
+                dockerFileDefaults()
             }
-        }
-        stage('Docker Build and Push') {
-          //don't need an agent as one is provided in shared pipeline library -> kypseli
-          agent none
-          when {
-            beforeAgent true
-            branch 'master'
-          }
-          steps {
-              dockerBuildPush("${repoName}", "${tag}",'./') {
-                unstash 'everything'
-            }
-          }
         }
     }
 }
